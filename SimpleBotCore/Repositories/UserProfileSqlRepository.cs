@@ -4,16 +4,18 @@ using SimpleBotCore.Logic;
 using System;
 using System.Data.SqlClient;
 using Dapper;
+using Microsoft.Extensions.Configuration;
 
 namespace SimpleBotCore.Repositories
 {
     public class UserProfileSqlRepository : IUserProfileRepository
     {
         private readonly SQLConfigConnection _config;
-
-        public UserProfileSqlRepository(IOptions<SQLConfigConnection> options)
+        private readonly string conexao;
+        public UserProfileSqlRepository(IOptions<SQLConfigConnection> options, IConfiguration configuration)
         {
-            _config = options.Value;            
+            _config = options.Value;
+            this.conexao = configuration.GetConnectionString("SQLSeverConnection");
         }
 
         public void AtualizaCor(string userId, string cor)
@@ -37,7 +39,7 @@ namespace SimpleBotCore.Repositories
             if (!Exists(userId))
                 throw new InvalidOperationException("Usuário não existe");
 
-            using (SqlConnection connection = new SqlConnection(_config.GetConnectionDefault()))
+            using (SqlConnection connection = new SqlConnection(this.conexao))
             {
                 connection.Execute("UPDATE User Idade = @idade WHERE Id = @id",
                     new
@@ -53,7 +55,7 @@ namespace SimpleBotCore.Repositories
             if (!Exists(userId))
                 throw new InvalidOperationException("Usuário não existe");
 
-            using (SqlConnection connection = new SqlConnection(_config.GetConnectionDefault()))
+            using (SqlConnection connection = new SqlConnection(this.conexao))
             {
                 connection.Execute("UPDATE User Name = @name WHERE Id = @id",
                     new
@@ -66,7 +68,7 @@ namespace SimpleBotCore.Repositories
 
         public SimpleUser Create(SimpleUser user)
         {
-            using (SqlConnection connection = new SqlConnection(_config.GetConnectionDefault()))
+            using (SqlConnection connection = new SqlConnection(this.conexao))
             {
                 if (Exists(user.Id))
                     throw new InvalidOperationException("Usuário ja existente");
@@ -84,7 +86,7 @@ namespace SimpleBotCore.Repositories
 
         public SimpleUser TryLoadUser(string userId)
         {
-            using (SqlConnection connection = new SqlConnection(_config.GetConnectionDefault()))
+            using (SqlConnection connection = new SqlConnection(this.conexao))
             {
                 SimpleUser user = (SimpleUser)connection.Query("SELECT Id, Nome, Idade, Cor from User WHERE Id = @id",
                     new

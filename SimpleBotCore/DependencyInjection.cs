@@ -2,6 +2,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using SimpleBotCore.Config;
 using SimpleBotCore.Repositories;
+using System;
+using System.Data.SqlClient;
 
 namespace SimpleBotCore
 {
@@ -42,17 +44,15 @@ namespace SimpleBotCore
 
         private static IServiceCollection AddSQLServerConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
-            bool sqlEnabled;
-
-            bool.TryParse(configuration.GetSection("ConnectionStrings:ConnectionStringSql:Enabled").Value, out sqlEnabled);
+            string sqlEnabled = configuration.GetSection("ConnectionStrings:SQLSeverConnection").Value;
 
             services.AddOptions<SQLConfigConnection>()
                     .Configure<IConfiguration>((settings, configuration) =>
                     {
-                        configuration.GetSection("ConnectionStrings:ConnectionStringSql").Bind(settings);
+                        configuration.GetSection("ConnectionStrings:SQLSeverConnection").Bind(settings);
                     });
 
-            if (sqlEnabled)
+            if (!string.IsNullOrEmpty(sqlEnabled))
             {
                 services.AddSingleton<IUserProfileRepository, UserProfileSqlRepository>();
             }

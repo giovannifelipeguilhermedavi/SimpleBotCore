@@ -3,9 +3,9 @@
     public class SQLConfigConnection
     {
         public string AuthSource { get; set; }
-        public string Database { get; set; } = "Chatbot";
+        public string Database { get; set; } = "ChatBot2";
         public bool? Enabled { get; set; }
-        public string Host { get; set; } = "localhost";
+        public string Host { get; set; } = "MSSQLLocalDB";
         public string Password { get; set; }
         public int Port { get; set; } = 27017;
         public string ReplicaSet { get; set; }
@@ -16,12 +16,12 @@
 
         public string GetConnectionDefault()
         {
-            return $"sqldb://{Host}:{Port}/{Database}";
+            return $"localdb://{Host}:{Port}/{Database}";
         }
 
         public string GetConnectionAtlas()
         {
-            return $"sqldb://{Username}:{Password}@{Host}/{Database}?ssl={UseSSL}&replicaSet={ReplicaSet}&authSource={AuthSource}&retryWrites={RetryWrites}&w={Write}";
+            return $"localdb://{Username}:{Password}@{Host}/{Database}?ssl={UseSSL}&replicaSet={ReplicaSet}&authSource={AuthSource}&retryWrites={RetryWrites}&w={Write}";
         }
     }
 }
